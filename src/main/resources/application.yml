@@ -1,0 +1,32 @@
+server:
+  port: 9002
+
+spring:
+  data:
+    web:
+      pageable:
+        page-parameter: page
+        size-parameter: size
+  jackson:
+    serialization:
+      write_dates_as_timestamps: false
+      INDENT_OUTPUT: true
+  datasource:
+    url: ${db-url:jdbc:postgresql://localhost:5432/english}
+    username: ${db-username:db-user}
+    password: ${db-password:db-password}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+keycloak-auth:
+  clientSecret: 59e22175-49e1-4f28-9a74-b82fbf08f95c
+  adminUsername: admin
+  adminPassword: admin
+
+keycloak:
+  authServerUrl: http://localhost:8080/auth/
+  realm: master
+  resource: english-client
+  public-client: true
+  ssl-required: "none"

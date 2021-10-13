@@ -1,0 +1,49 @@
+version: '3'
+services:
+
+  postgres:
+    image: postgres:11
+    container_name: english_postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "db-user" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+    environment:
+      - POSTGRES_USER=db-user
+      - POSTGRES_PASSWORD=db-password
+      - POSTGRES_MULTIPLE_DATABASES=english, english-keycloak
+    volumes:
+      - ./services/postgres:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  keycloak:
+   image: quay.io/keycloak/keycloak:latest
+   container_name: english_keycloak
+   volumes:
+     - ./services/keycloak/realm:/opt/jboss/keycloak/imports
+     - ./services/keycloak/user/keycloak-add-user.json:/opt/jboss/keycloak/standalone/configuration/keycloak-add-user.json
+   command:
+     - "-b 0.0.0.0"
+     #import keycloak state from exported file
+     #to export keycloak configuration, go to "Export" menu in keycloak
+     - "-Dkeycloak.migration.action=import"
+     - "-Dkeycloak.migration.provider=singleFile"
+     - "-Dkeycloak.migration.strategy=IGNORE_EXISTING"
+     - "-Dkeycloak.migration.file=/opt/jboss/keycloak/imports/realm-export.json"
+     - "-Dkeycloak.profile.feature.account_api=enabled"
+   environment:
+     DB_VENDOR: POSTGRES
+     DB_ADDR: postgres
+     DB_DATABASE: english-keycloak
+     DB_USER: db-user
+     DB_SCHEMA: public
+     DB_PASSWORD: db-password
+     # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+     #JDBC_PARAMS: "ssl=true"
+   ports:
+     - 8080:8080
+   depends_on:
+     - postgres
