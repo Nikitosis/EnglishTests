@@ -11,5 +11,6 @@ import java.util.List;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
+    UserResponse toResponse(User user);
     List<UserResponse> toResponses(List<User> users);
 }
