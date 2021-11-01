@@ -25,7 +25,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(nullable = false)
     private LocalDateTime birthday;
 
     @Column(nullable = false, unique = true)
@@ -40,4 +39,7 @@ public class User {
 
     @Column(name = "is_knowledge_test_passed", nullable = false)
     private Boolean isKnowledgeTestPassed;
+
+    @Column(name = "keycloak_id", unique = true)
+    private String keycloakId;
 }
