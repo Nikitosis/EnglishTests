@@ -4,11 +4,12 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @Entity
 @Table(name = "user_available_test")
-public class UserAvailableAssignment implements Serializable {
+public class UserAssignment implements Serializable {
     @Id
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -22,4 +23,10 @@ public class UserAvailableAssignment implements Serializable {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserAssignmentStatus status;
+
+    @OneToMany(mappedBy = "userAssignment")
+    private List<UserAnswer> userAnswers;
+
+    @Column(name = "is_available", nullable = false)
+    private Boolean isAvailable;
 }

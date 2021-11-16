@@ -25,6 +25,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Column(name = "user_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
+
     private LocalDateTime birthday;
 
     @Column(nullable = false, unique = true)
