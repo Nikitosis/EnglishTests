@@ -1,7 +1,7 @@
 package io.english.controller;
 
 import io.english.entity.response.UserAvailableAssignmentResponse;
-import io.english.service.UserAvailableAssignmentService;
+import io.english.service.UserAssignmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,11 +13,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(value = "assignments")
 public class AssignmentController {
-    private final UserAvailableAssignmentService userAvailableAssignmentService;
+    private final UserAssignmentService userAvailableAssignmentService;
 
     @GetMapping("available")
     public List<UserAvailableAssignmentResponse> getAvailableAssignments() {
-        Long userId = 1L;
-        return userAvailableAssignmentService.getAvailableAssignmentsByUserId(userId);
+        return userAvailableAssignmentService.getAvailableAssignments();
     }
 }
