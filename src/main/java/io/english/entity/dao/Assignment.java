@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -19,6 +20,9 @@ public class Assignment {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "assignment")
+    private List<AssignmentItem> assignmentItems;
 
     @ManyToOne
     @JoinColumn(name = "created_by_id")

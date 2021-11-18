@@ -10,14 +10,12 @@ import java.io.Serializable;
 @Table(name = "user_answer")
 public class UserAnswer implements Serializable {
     @Id
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Id
     @ManyToOne
-    @JoinColumn(name = "assignment_item_id", nullable = false)
-    private AssignmentItem assignmentItem;
+    @JoinColumn(name = "user_assignment_id", nullable = false)
+    private UserAssignment userAssignment;
 
     @ManyToOne
     @JoinColumn(nullable = false)
