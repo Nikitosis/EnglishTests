@@ -2,6 +2,7 @@ package io.english.entity.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.english.entity.dao.Gender;
+import io.english.entity.dao.UserType;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -30,4 +31,8 @@ public class UserCreateRequest {
 
     @NotBlank
     private String password;
+
+    @NotNull
+    @JsonProperty("user_type")
+    private UserType userType;
 }

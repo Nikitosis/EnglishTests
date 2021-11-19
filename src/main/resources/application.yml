@@ -20,7 +20,7 @@ spring:
       ddl-auto: update
 
 keycloak-auth:
-  clientSecret: 0986d7fe-a316-4b0e-ba30-a7fe33ecce9d
+  clientSecret: 63347cfd-dca8-4e9b-9e11-33984e5d392e
   adminUsername: admin
   adminPassword: admin
 

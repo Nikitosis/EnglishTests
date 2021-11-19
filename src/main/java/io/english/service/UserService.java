@@ -49,6 +49,7 @@ public class UserService {
         user.setBirthday(request.getBirthday());
         user.setEmail(request.getEmail());
         user.setIsKnowledgeTestPassed(false);
+        user.setUserType(request.getUserType());
 
         userRepository.save(user);
 
