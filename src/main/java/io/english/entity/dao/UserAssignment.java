@@ -10,12 +10,15 @@ import java.util.List;
 @Entity
 @Table(name = "user_available_test")
 public class UserAssignment implements Serializable {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Id
     @ManyToOne
     @JoinColumn(name = "assignment_id", nullable = false)
     private Assignment assignment;
