@@ -15,11 +15,9 @@ import java.time.LocalDateTime;
 @Data
 public class UserCreateRequest {
     @NotBlank
-    @JsonProperty("first_name")
     private String firstName;
 
     @NotBlank
-    @JsonProperty("last_name")
     private String lastName;
 
     private Gender gender;
@@ -33,6 +31,5 @@ public class UserCreateRequest {
     private String password;
 
     @NotNull
-    @JsonProperty("user_type")
     private UserType userType;
 }
