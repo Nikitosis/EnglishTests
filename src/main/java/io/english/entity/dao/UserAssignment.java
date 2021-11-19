@@ -1,5 +1,6 @@
 package io.english.entity.dao;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -7,6 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Data
+@Builder
 @Entity
 @Table(name = "user_available_test")
 public class UserAssignment implements Serializable {
