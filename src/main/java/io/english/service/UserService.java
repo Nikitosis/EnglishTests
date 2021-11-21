@@ -2,9 +2,11 @@ package io.english.service;
 
 import io.english.entity.dao.User;
 import io.english.entity.request.UserCreateRequest;
+import io.english.entity.request.UserSearchRequest;
 import io.english.exceptions.EntityNotFoundException;
 import io.english.exceptions.RequestValidationException;
 import io.english.repository.UserRepository;
+import io.english.repository.specification.UserSearchSpecification;
 import io.english.utils.SecurityRoles;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,11 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final KeycloakAuthService keycloakAuthService;
+
+    public List<User> search(UserSearchRequest request) {
+        UserSearchSpecification specification = new UserSearchSpecification(request);
+        return userRepository.findAll(specification);
+    }
 
     public List<User> getAll() {
         return userRepository.findAll();
@@ -49,6 +56,7 @@ public class UserService {
         user.setBirthday(request.getBirthday());
         user.setEmail(request.getEmail());
         user.setIsKnowledgeTestPassed(false);
+        user.setUserType(request.getUserType());
 
         userRepository.save(user);
 
