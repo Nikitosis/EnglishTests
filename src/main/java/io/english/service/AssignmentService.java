@@ -27,9 +27,9 @@ public class AssignmentService {
                 () -> new EntityNotFoundException(String.format("Assignment not found by id=%d", id)));
     }
 
-    public Assignment createAssignment(AssignmentRequest assignmentRequest) {
+    public Assignment createAssignment(AssignmentRequest assignmentRequest, Long createdById) {
         var assignment = AssignmentMapper.INSTANCE.toEntity(assignmentRequest);
-        var user = userService.getCurrentUser();
+        var user = userService.getById(createdById);
         assignment.setCreatedAt(LocalDateTime.now());
         assignment.setCreatedBy(user);
         assignment.setType(AssignmentType.CUSTOM_TEST);
@@ -50,7 +50,7 @@ public class AssignmentService {
     }
 
     public List<Assignment> search(AssignmentSearchRequest request) {
-        AssignmentSearchSpecification specification = new AssignmentSearchSpecification(request);
+        var specification = new AssignmentSearchSpecification(request);
         return assignmentRepository.findAll(specification);
     }
 }

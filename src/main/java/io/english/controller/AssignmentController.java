@@ -7,6 +7,7 @@ import io.english.entity.request.AssignmentRequest;
 import io.english.entity.response.AssignmentResponse;
 import io.english.mappers.AssignmentMapper;
 import io.english.service.AssignmentService;
+import io.english.utils.PrincipalUtils;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +19,12 @@ import java.util.List;
 @RequestMapping(value = "/assignment")
 public class AssignmentController {
     private final AssignmentService assignmentService;
+    private final PrincipalUtils principalUtils;
 
     @PostMapping
     public AssignmentResponse createAssignment(@RequestBody AssignmentRequest assignmentRequest) {
-        var assignment = assignmentService.createAssignment(assignmentRequest);
+        Long createdById = principalUtils.getUserIdFromPrincipal();
+        var assignment = assignmentService.createAssignment(assignmentRequest, createdById);
         return AssignmentMapper.INSTANCE.toResponse(assignment);
     }
 
