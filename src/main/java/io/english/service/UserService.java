@@ -3,6 +3,7 @@ package io.english.service;
 import io.english.entity.dao.User;
 import io.english.entity.request.UserCreateRequest;
 import io.english.exceptions.EntityNotFoundException;
+import io.english.exceptions.InvalidAccessException;
 import io.english.exceptions.RequestValidationException;
 import io.english.repository.UserRepository;
 import io.english.utils.PrincipalUtils;
@@ -65,5 +66,21 @@ public class UserService {
         user.setKeycloakId(keycloakId);
 
         return userRepository.save(user);
+    }
+
+    public User assignTeacher(Long id) {
+        var teacher = getCurrentUser();
+        User student = getById(id);
+        if (student.getTeacher() != null) {
+            throw new InvalidAccessException(String.format("Student with id=%d already has a teacher", id));
+        }
+        student.setTeacher(teacher);
+        return userRepository.save(student);
+    }
+
+    public User deleteTeacher(Long id) {
+        User student = getById(id);
+        student.setTeacher(null);
+        return userRepository.save(student);
     }
 }

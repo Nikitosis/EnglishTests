@@ -36,7 +36,7 @@ public class UsersController {
     @PreAuthorize("hasAnyAuthority('USER')")
     public ResponseEntity<UserResponse> getUser() {
         Long userId = principalUtils.getUserIdFromPrincipal();
-        User user = userService.getById(userId);
+        var user = userService.getById(userId);
 
         UserResponse response = UserMapper.INSTANCE.toResponse(user);
 
@@ -45,7 +45,21 @@ public class UsersController {
 
     @PostMapping
     public ResponseEntity<UserResponse> create(@Valid @RequestBody UserCreateRequest request) {
-        User user = userService.create(request);
+        var user = userService.create(request);
+        UserResponse response = UserMapper.INSTANCE.toResponse(user);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("{id}/teacher")
+    public ResponseEntity<UserResponse> assignTeacher(@PathVariable Long id) {
+        User user = userService.assignTeacher(id);
+        UserResponse response = UserMapper.INSTANCE.toResponse(user);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("{id}/teacher")
+    public ResponseEntity<UserResponse> deleteTeacher(@PathVariable Long id) {
+        User user = userService.deleteTeacher(id);
         UserResponse response = UserMapper.INSTANCE.toResponse(user);
         return ResponseEntity.ok(response);
     }
