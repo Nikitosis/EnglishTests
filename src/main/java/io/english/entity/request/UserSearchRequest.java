@@ -1,30 +1,26 @@
-package io.english.entity.response;
+package io.english.entity.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.english.entity.dao.EnglishLevel;
 import io.english.entity.dao.Gender;
-import io.english.entity.dao.User;
 import io.english.entity.dao.UserType;
+import io.english.entity.response.UserResponse;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
-public class UserResponse {
+@Accessors(chain = true)
+public class UserSearchRequest {
     private Long id;
 
     private String firstName;
 
     private String lastName;
 
-    private Gender gender;
-
-    private LocalDateTime birthday;
-
     private String email;
 
-    private UserResponse teacher;
+    private Long teacherId;
 
     private UserType userType;
 

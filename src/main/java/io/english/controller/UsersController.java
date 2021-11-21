@@ -1,7 +1,10 @@
 package io.english.controller;
 
+import io.english.entity.dao.EnglishLevel;
 import io.english.entity.dao.User;
+import io.english.entity.dao.UserType;
 import io.english.entity.request.UserCreateRequest;
+import io.english.entity.request.UserSearchRequest;
 import io.english.entity.response.UserResponse;
 import io.english.mappers.UserMapper;
 import io.english.service.UserService;
@@ -25,8 +28,20 @@ public class UsersController {
     private final PrincipalUtils principalUtils;
 
     @GetMapping("/search")
-    public ResponseEntity<List<UserResponse>> search() {
-        List<User> users = userService.getAll();
+    public ResponseEntity<List<UserResponse>> search(@RequestParam(value = "userType", required = false) UserType userType,
+                                                     @RequestParam(value = "id", required = false) Long id,
+                                                     @RequestParam(value = "teacherId", required = false) Long teacherId,
+                                                     @RequestParam(value = "englishLevel", required = false) EnglishLevel englishLevel,
+                                                     @RequestParam(value = "isKnowledgeTestPassed", required = false) Boolean isKnowledgeTestPassed,
+                                                     @RequestParam(value = "email", required = false) String email,
+                                                     @RequestParam(value = "firstName", required = false) String firstName,
+                                                     @RequestParam(value = "lastName", required = false) String lastName) {
+        UserSearchRequest request = new UserSearchRequest()
+                .setUserType(userType).setId(id).setTeacherId(teacherId)
+                .setEnglishLevel(englishLevel).setIsKnowledgeTestPassed(isKnowledgeTestPassed)
+                .setEmail(email).setFirstName(firstName).setLastName(lastName);
+
+        List<User> users = userService.search(request);
         List<UserResponse> responses = UserMapper.INSTANCE.toResponses(users);
 
         return ResponseEntity.ok(responses);
