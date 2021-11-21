@@ -5,6 +5,7 @@ import io.english.entity.request.UserCreateRequest;
 import io.english.exceptions.EntityNotFoundException;
 import io.english.exceptions.RequestValidationException;
 import io.english.repository.UserRepository;
+import io.english.utils.PrincipalUtils;
 import io.english.utils.SecurityRoles;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final KeycloakAuthService keycloakAuthService;
+    private final PrincipalUtils principalUtils;
 
     public List<User> getAll() {
         return userRepository.findAll();
@@ -36,13 +38,18 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User not found by id=%d", id)));
     }
 
+    public User getCurrentUser() {
+        Long userId = principalUtils.getUserIdFromPrincipal();
+        return getById(userId);
+    }
+
     @Transactional
     public User create(UserCreateRequest request) {
-        if(userRepository.findByEmail(request.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RequestValidationException(String.format("User with already exists with email=%s", request.getEmail()));
         }
 
-        User user = new User();
+        var user = new User();
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setGender(request.getGender());

@@ -1,46 +1,35 @@
 package io.english.controller;
 
-import io.english.entity.dao.UserAssignment;
-import io.english.entity.request.ChangeAssignmentIsAvailableRequest;
-import io.english.entity.request.UserAnswersRequest;
-import io.english.entity.response.UserAnswerResponse;
-import io.english.entity.response.UserAssignmentResponse;
-import io.english.entity.response.UserAvailableAssignmentResponse;
-import io.english.mappers.UserAssignmentMapper;
-import io.english.service.UserAssignmentService;
+import io.english.entity.dao.Assignment;
+import io.english.entity.request.AssignmentRequest;
+import io.english.entity.response.AssignmentResponse;
+import io.english.mappers.AssignmentMapper;
+import io.english.service.AssignmentService;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "assignment")
 public class AssignmentController {
-    private final UserAssignmentService userAssignmentService;
+    private final AssignmentService assignmentService;
 
-    @GetMapping("available")
-    public List<UserAvailableAssignmentResponse> getAvailableAssignments() {
-        List<UserAssignment> userAssignments = userAssignmentService.getAvailableAssignments();
-        return UserAssignmentMapper.INSTANCE.toAvailableResponses(userAssignments);
+    @PostMapping
+    public AssignmentResponse createAssignment(@RequestBody AssignmentRequest assignmentRequest) {
+        Assignment assignment = assignmentService.createAssignment(assignmentRequest);
+        return AssignmentMapper.INSTANCE.toResponse(assignment);
     }
 
-    @PutMapping("{assignmentId}/user/{userId}")
-    public UserAssignmentResponse changeAssignmentIsAvailable(
-            @RequestBody ChangeAssignmentIsAvailableRequest changeAssignmentIsAvailableRequest,
-            @PathVariable Long assignmentId,
-            @PathVariable Long userId) {
-        UserAssignment userAssignment = userAssignmentService.changeAssignmentIsAvailable(
-                assignmentId,
-                userId,
-                changeAssignmentIsAvailableRequest);
-        return UserAssignmentMapper.INSTANCE.toUserAssignmentResponse(userAssignment);
+    @PutMapping("{id}")
+    public AssignmentResponse updateAssignment(@RequestBody AssignmentRequest assignmentRequest, @PathVariable Long id) {
+        Assignment assignment = assignmentService.updateAssignment(assignmentRequest, id);
+        return AssignmentMapper.INSTANCE.toResponse(assignment);
     }
 
-    @PostMapping("{assignmentId}")
-    public UserAnswerResponse checkUserAnswers(@RequestBody UserAnswersRequest userAnswersRequest,
-                                               @PathVariable Long assignmentId) {
-        UserAssignment userAssignment = userAssignmentService.checkUserAnswers(userAnswersRequest, assignmentId);
-        return UserAssignmentMapper.INSTANCE.toUserAnswerResponse(userAssignment);
+    @DeleteMapping("{id}")
+    public AssignmentResponse deleteAssignment(@PathVariable Long id) {
+        Assignment assignment = assignmentService.deleteAssignment(id);
+        return AssignmentMapper.INSTANCE.toResponse(assignment);
     }
 }

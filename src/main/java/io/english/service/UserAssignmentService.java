@@ -28,7 +28,7 @@ public class UserAssignmentService {
     }
 
     public UserAssignment changeAssignmentIsAvailable(Long assignmentId, Long userId, ChangeAssignmentIsAvailableRequest changeAssignmentIsAvailableRequest) {
-        Assignment assignment = assignmentService.getById(assignmentId);
+        var assignment = assignmentService.getById(assignmentId);
         Boolean isAvailable = changeAssignmentIsAvailableRequest.getIsAvailable();
         var student = userService.getById(userId);
         Optional<UserAssignment> optionalUserAssignment = userAssignmentRepository.findByAssignmentAndUser(assignment, student);
@@ -62,9 +62,8 @@ public class UserAssignmentService {
     }
 
     public UserAssignment checkUserAnswers(UserAnswersRequest userAnswersRequest, Long assignmentId) {
-        Assignment assignment = assignmentService.getById(assignmentId);
-        Long userId = principalUtils.getUserIdFromPrincipal();
-        var user = userService.getById(userId);
+        var assignment = assignmentService.getById(assignmentId);
+        var user = userService.getCurrentUser();
         var userAssignment = getByAssignmentAndUser(assignment, user);
         int mark = (int) userAnswersRequest.getAnswers().stream()
                 .filter(answer -> assignmentItemAnswerService.getById(answer.getAssignmentAnswerId()).getIsCorrectAnswer())
