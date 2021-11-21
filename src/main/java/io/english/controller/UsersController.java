@@ -63,4 +63,11 @@ public class UsersController {
         UserResponse response = UserMapper.INSTANCE.toResponse(user);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("teachers")
+    public ResponseEntity<List<UserResponse>> getTeachers() {
+        List<User> users = userService.getTeachers();
+        List<UserResponse> responses = UserMapper.INSTANCE.toResponses(users);
+        return ResponseEntity.ok(responses);
+    }
 }

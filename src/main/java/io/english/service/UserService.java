@@ -1,6 +1,7 @@
 package io.english.service;
 
 import io.english.entity.dao.User;
+import io.english.entity.dao.UserType;
 import io.english.entity.request.UserCreateRequest;
 import io.english.exceptions.EntityNotFoundException;
 import io.english.exceptions.InvalidAccessException;
@@ -82,5 +83,9 @@ public class UserService {
         User student = getById(id);
         student.setTeacher(null);
         return userRepository.save(student);
+    }
+
+    public List<User> getTeachers() {
+        return userRepository.findAllByUserType(UserType.TEACHER);
     }
 }
