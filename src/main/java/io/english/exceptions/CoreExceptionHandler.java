@@ -77,6 +77,12 @@ public class CoreExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(InvalidAccessException.class)
+    public ResponseEntity<Object> handleInvalidAccessException(Exception e) {
+        log.warn(e.getMessage(), e);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception e) {
         log.warn(e.getMessage(), e);

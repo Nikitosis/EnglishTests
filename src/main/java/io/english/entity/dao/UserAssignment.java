@@ -1,13 +1,17 @@
 package io.english.entity.dao;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
-@Data
+@Builder
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "user_available_test")
 public class UserAssignment implements Serializable {
 
@@ -32,4 +36,7 @@ public class UserAssignment implements Serializable {
 
     @Column(name = "is_available", nullable = false)
     private Boolean isAvailable;
+
+    @Column(name = "mark")
+    private Integer mark;
 }
