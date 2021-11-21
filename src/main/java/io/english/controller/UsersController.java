@@ -65,25 +65,18 @@ public class UsersController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("{id}/teacher")
+    @PutMapping("/current/teacher/{id}")
     public ResponseEntity<UserResponse> assignTeacher(@PathVariable Long id) {
         Long teacherId = principalUtils.getUserIdFromPrincipal();
-        User user = userService.assignTeacher(id, teacherId);
+        var user = userService.assignTeacher(id, teacherId);
         UserResponse response = UserMapper.INSTANCE.toResponse(user);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("{id}/teacher")
+    @DeleteMapping("/current/teacher/{id}")
     public ResponseEntity<UserResponse> deleteTeacher(@PathVariable Long id) {
         var user = userService.deleteTeacher(id);
         UserResponse response = UserMapper.INSTANCE.toResponse(user);
         return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("teachers")
-    public ResponseEntity<List<UserResponse>> getTeachers() {
-        List<User> users = userService.getTeachers();
-        List<UserResponse> responses = UserMapper.INSTANCE.toResponses(users);
-        return ResponseEntity.ok(responses);
     }
 }
