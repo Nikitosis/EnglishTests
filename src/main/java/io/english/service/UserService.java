@@ -78,6 +78,9 @@ public class UserService {
 
     public User assignTeacher(Long id, Long teacherId) {
         var teacher = getById(teacherId);
+        if (!UserType.TEACHER.equals(teacher.getUserType())) {
+            throw new InvalidAccessException(String.format("User with id=%d is not a teacher", teacherId));
+        }
         User student = getById(id);
         if (student.getTeacher() != null) {
             throw new InvalidAccessException(String.format("Student with id=%d already has a teacher", id));
