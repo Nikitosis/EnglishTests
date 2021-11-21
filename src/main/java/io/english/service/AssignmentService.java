@@ -2,12 +2,14 @@ package io.english.service;
 
 import io.english.entity.dao.Assignment;
 import io.english.entity.dao.AssignmentItem;
+import io.english.entity.dao.AssignmentSearchRequest;
 import io.english.entity.dao.AssignmentType;
 import io.english.entity.request.AssignmentRequest;
 import io.english.exceptions.EntityNotFoundException;
 import io.english.mappers.AssignmentItemMapper;
 import io.english.mappers.AssignmentMapper;
 import io.english.repository.AssignmentRepository;
+import io.english.repository.specification.AssignmentSearchSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +28,7 @@ public class AssignmentService {
     }
 
     public Assignment createAssignment(AssignmentRequest assignmentRequest) {
-        Assignment assignment = AssignmentMapper.INSTANCE.toEntity(assignmentRequest);
+        var assignment = AssignmentMapper.INSTANCE.toEntity(assignmentRequest);
         var user = userService.getCurrentUser();
         assignment.setCreatedAt(LocalDateTime.now());
         assignment.setCreatedBy(user);
@@ -45,5 +47,10 @@ public class AssignmentService {
         var assignment = getById(id);
         assignmentRepository.deleteById(id);
         return assignment;
+    }
+
+    public List<Assignment> search(AssignmentSearchRequest request) {
+        AssignmentSearchSpecification specification = new AssignmentSearchSpecification(request);
+        return assignmentRepository.findAll(specification);
     }
 }

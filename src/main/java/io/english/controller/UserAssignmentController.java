@@ -43,4 +43,10 @@ public class UserAssignmentController {
         var userAssignment = userAssignmentService.checkUserAnswers(userAnswersRequest, assignmentId);
         return UserAssignmentMapper.INSTANCE.toUserAnswerResponse(userAssignment);
     }
+
+    @GetMapping("available/{studentId}")
+    public List<UserAvailableAssignmentResponse> getAvailableAssignments(@PathVariable Long studentId) {
+        List<UserAssignment> userAssignments = userAssignmentService.getAvailableAssignments(studentId);
+        return UserAssignmentMapper.INSTANCE.toAvailableResponses(userAssignments);
+    }
 }

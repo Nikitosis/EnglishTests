@@ -24,7 +24,7 @@ public class UserAssignmentService {
 
     public List<UserAssignment> getAvailableAssignments() {
         Long userId = principalUtils.getUserIdFromPrincipal();
-        return userAssignmentRepository.findAllByUserIdAndIsAvailableTrue(userId);
+        return getAvailableAssignments(userId);
     }
 
     public UserAssignment changeAssignmentIsAvailable(Long assignmentId, Long userId, ChangeAssignmentIsAvailableRequest changeAssignmentIsAvailableRequest) {
@@ -96,5 +96,9 @@ public class UserAssignmentService {
         return userAssignmentRepository.findByAssignmentAndUser(assignment, student).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Assignment not found by assignment id=%d and user id=%d",
                         assignment.getId(), student.getId())));
+    }
+
+    public List<UserAssignment> getAvailableAssignments(Long studentId) {
+        return userAssignmentRepository.findAllByUserIdAndIsAvailableTrue(studentId);
     }
 }
