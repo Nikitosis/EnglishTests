@@ -1,5 +1,6 @@
 package io.english.service;
 
+import io.english.entity.dao.EnglishLevel;
 import io.english.entity.dao.User;
 import io.english.entity.dao.UserType;
 import io.english.entity.request.UserCreateRequest;
@@ -9,7 +10,6 @@ import io.english.exceptions.InvalidAccessException;
 import io.english.exceptions.RequestValidationException;
 import io.english.repository.UserRepository;
 import io.english.repository.specification.UserSearchSpecification;
-import io.english.utils.PrincipalUtils;
 import io.english.utils.SecurityRoles;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +26,9 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final KeycloakAuthService keycloakAuthService;
-    private final PrincipalUtils principalUtils;
 
     public List<User> search(UserSearchRequest request) {
-        UserSearchSpecification specification = new UserSearchSpecification(request);
+        var specification = new UserSearchSpecification(request);
         return userRepository.findAll(specification);
     }
 
@@ -45,11 +44,6 @@ public class UserService {
     public User getById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User not found by id=%d", id)));
-    }
-
-    public User getCurrentUser() {
-        Long userId = principalUtils.getUserIdFromPrincipal();
-        return getById(userId);
     }
 
     @Transactional
@@ -77,8 +71,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User assignTeacher(Long id) {
-        var teacher = getCurrentUser();
+    public User assignEnglishLevel(User user, EnglishLevel englishLevel) {
+        user.setEnglishLevel(englishLevel);
+        return userRepository.save(user);
+    }
+
+    public User assignTeacher(Long id, Long teacherId) {
+        var teacher = getById(teacherId);
         User student = getById(id);
         if (student.getTeacher() != null) {
             throw new InvalidAccessException(String.format("Student with id=%d already has a teacher", id));

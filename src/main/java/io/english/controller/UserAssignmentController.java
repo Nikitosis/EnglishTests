@@ -8,6 +8,7 @@ import io.english.entity.response.UserAssignmentResponse;
 import io.english.entity.response.UserAvailableAssignmentResponse;
 import io.english.mappers.UserAssignmentMapper;
 import io.english.service.UserAssignmentService;
+import io.english.utils.PrincipalUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,10 +19,12 @@ import java.util.List;
 @RequestMapping(value = "/user-assignment")
 public class UserAssignmentController {
     private final UserAssignmentService userAssignmentService;
+    private final PrincipalUtils principalUtils;
 
     @GetMapping("/available")
     public List<UserAvailableAssignmentResponse> getAvailableAssignments() {
-        List<UserAssignment> userAssignments = userAssignmentService.getAvailableAssignments();
+        Long userId = principalUtils.getUserIdFromPrincipal();
+        List<UserAssignment> userAssignments = userAssignmentService.getAvailableAssignments(userId);
         return UserAssignmentMapper.INSTANCE.toAvailableResponses(userAssignments);
     }
 
@@ -30,17 +33,19 @@ public class UserAssignmentController {
             @RequestBody ChangeAssignmentIsAvailableRequest changeAssignmentIsAvailableRequest,
             @PathVariable Long assignmentId,
             @PathVariable Long userId) {
+        Long teacherId = principalUtils.getUserIdFromPrincipal();
         var userAssignment = userAssignmentService.changeAssignmentIsAvailable(
                 assignmentId,
                 userId,
-                changeAssignmentIsAvailableRequest);
+                changeAssignmentIsAvailableRequest, teacherId);
         return UserAssignmentMapper.INSTANCE.toUserAssignmentResponse(userAssignment);
     }
 
     @PostMapping("/{assignmentId}")
     public UserAnswerResponse checkUserAnswers(@RequestBody UserAnswersRequest userAnswersRequest,
                                                @PathVariable Long assignmentId) {
-        var userAssignment = userAssignmentService.checkUserAnswers(userAnswersRequest, assignmentId);
+        Long userId = principalUtils.getUserIdFromPrincipal();
+        var userAssignment = userAssignmentService.checkUserAnswers(userAnswersRequest, assignmentId, userId);
         return UserAssignmentMapper.INSTANCE.toUserAnswerResponse(userAssignment);
     }
 

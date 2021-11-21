@@ -67,14 +67,15 @@ public class UsersController {
 
     @PutMapping("{id}/teacher")
     public ResponseEntity<UserResponse> assignTeacher(@PathVariable Long id) {
-        User user = userService.assignTeacher(id);
+        Long teacherId = principalUtils.getUserIdFromPrincipal();
+        User user = userService.assignTeacher(id, teacherId);
         UserResponse response = UserMapper.INSTANCE.toResponse(user);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("{id}/teacher")
     public ResponseEntity<UserResponse> deleteTeacher(@PathVariable Long id) {
-        User user = userService.deleteTeacher(id);
+        var user = userService.deleteTeacher(id);
         UserResponse response = UserMapper.INSTANCE.toResponse(user);
         return ResponseEntity.ok(response);
     }

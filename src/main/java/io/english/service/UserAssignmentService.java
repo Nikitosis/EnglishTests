@@ -6,7 +6,6 @@ import io.english.entity.request.UserAnswersRequest;
 import io.english.exceptions.EntityNotFoundException;
 import io.english.exceptions.InvalidAccessException;
 import io.english.repository.UserAssignmentRepository;
-import io.english.utils.PrincipalUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,14 +19,8 @@ public class UserAssignmentService {
     private final AssignmentService assignmentService;
     private final UserService userService;
     private final AssignmentItemAnswerService assignmentItemAnswerService;
-    private final PrincipalUtils principalUtils;
 
-    public List<UserAssignment> getAvailableAssignments() {
-        Long userId = principalUtils.getUserIdFromPrincipal();
-        return getAvailableAssignments(userId);
-    }
-
-    public UserAssignment changeAssignmentIsAvailable(Long assignmentId, Long userId, ChangeAssignmentIsAvailableRequest changeAssignmentIsAvailableRequest) {
+    public UserAssignment changeAssignmentIsAvailable(Long assignmentId, Long userId, ChangeAssignmentIsAvailableRequest changeAssignmentIsAvailableRequest, Long teacherId) {
         var assignment = assignmentService.getById(assignmentId);
         Boolean isAvailable = changeAssignmentIsAvailableRequest.getIsAvailable();
         var student = userService.getById(userId);
@@ -36,22 +29,22 @@ public class UserAssignmentService {
         if (optionalUserAssignment.isEmpty()) {
             userAssignment = createUserAssignment(student, isAvailable, assignment);
         } else {
-            userAssignment = updateUserAssignment(optionalUserAssignment.get(), isAvailable);
+            userAssignment = updateUserAssignment(optionalUserAssignment.get(), isAvailable, teacherId);
         }
         return userAssignment;
     }
 
     private UserAssignment createUserAssignment(User student, Boolean isAvailable, Assignment assignment) {
-        return userAssignmentRepository.save(UserAssignment.builder()
+        var userAssignment = UserAssignment.builder()
                 .user(student)
                 .isAvailable(isAvailable)
                 .status(UserAssignmentStatus.NOT_STARTED)
                 .assignment(assignment)
-                .build());
+                .build();
+        return userAssignmentRepository.save(userAssignment);
     }
 
-    private UserAssignment updateUserAssignment(UserAssignment userAssignment, Boolean isAvailable) {
-        Long teacherId = principalUtils.getUserIdFromPrincipal();
+    private UserAssignment updateUserAssignment(UserAssignment userAssignment, Boolean isAvailable, Long teacherId) {
         if (!teacherId.equals(userAssignment.getAssignment().getCreatedBy().getId())) {
             throw new InvalidAccessException("Assignment was created by a different user");
         }
@@ -61,9 +54,9 @@ public class UserAssignmentService {
         return userAssignment;
     }
 
-    public UserAssignment checkUserAnswers(UserAnswersRequest userAnswersRequest, Long assignmentId) {
+    public UserAssignment checkUserAnswers(UserAnswersRequest userAnswersRequest, Long assignmentId, Long userId) {
         var assignment = assignmentService.getById(assignmentId);
-        var user = userService.getCurrentUser();
+        var user = userService.getById(userId);
         var userAssignment = getByAssignmentAndUser(assignment, user);
         int mark = (int) userAnswersRequest.getAnswers().stream()
                 .filter(answer -> assignmentItemAnswerService.getById(answer.getAssignmentAnswerId()).getIsCorrectAnswer())
@@ -71,8 +64,9 @@ public class UserAssignmentService {
         userAssignment.setMark(mark);
         if (assignment.getType().equals(AssignmentType.DEFAULT_KNOWLEDGE_TEST)) {
             var englishLevel = getEnglishLevelFromMarkAndAssignment(mark, assignment);
-            user.setEnglishLevel(englishLevel);
+            userService.assignEnglishLevel(user, englishLevel);
         }
+        userAssignmentRepository.save(userAssignment);
         return userAssignment;
     }
 
