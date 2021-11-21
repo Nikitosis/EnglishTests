@@ -15,17 +15,17 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "user-assignment")
+@RequestMapping(value = "/user-assignment")
 public class UserAssignmentController {
     private final UserAssignmentService userAssignmentService;
 
-    @GetMapping("available")
+    @GetMapping("/available")
     public List<UserAvailableAssignmentResponse> getAvailableAssignments() {
         List<UserAssignment> userAssignments = userAssignmentService.getAvailableAssignments();
         return UserAssignmentMapper.INSTANCE.toAvailableResponses(userAssignments);
     }
 
-    @PutMapping("{assignmentId}/user/{userId}")
+    @PutMapping("/{assignmentId}/user/{userId}")
     public UserAssignmentResponse changeAssignmentIsAvailable(
             @RequestBody ChangeAssignmentIsAvailableRequest changeAssignmentIsAvailableRequest,
             @PathVariable Long assignmentId,
@@ -37,14 +37,14 @@ public class UserAssignmentController {
         return UserAssignmentMapper.INSTANCE.toUserAssignmentResponse(userAssignment);
     }
 
-    @PostMapping("{assignmentId}")
+    @PostMapping("/{assignmentId}")
     public UserAnswerResponse checkUserAnswers(@RequestBody UserAnswersRequest userAnswersRequest,
                                                @PathVariable Long assignmentId) {
         var userAssignment = userAssignmentService.checkUserAnswers(userAnswersRequest, assignmentId);
         return UserAssignmentMapper.INSTANCE.toUserAnswerResponse(userAssignment);
     }
 
-    @GetMapping("available/{studentId}")
+    @GetMapping("/available/{studentId}")
     public List<UserAvailableAssignmentResponse> getAvailableAssignments(@PathVariable Long studentId) {
         List<UserAssignment> userAssignments = userAssignmentService.getAvailableAssignments(studentId);
         return UserAssignmentMapper.INSTANCE.toAvailableResponses(userAssignments);

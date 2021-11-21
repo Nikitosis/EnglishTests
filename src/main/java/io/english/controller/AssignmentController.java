@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "assignment")
+@RequestMapping(value = "/assignment")
 public class AssignmentController {
     private final AssignmentService assignmentService;
 
@@ -25,13 +25,13 @@ public class AssignmentController {
         return AssignmentMapper.INSTANCE.toResponse(assignment);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public AssignmentResponse updateAssignment(@RequestBody AssignmentRequest assignmentRequest, @PathVariable Long id) {
         var assignment = assignmentService.updateAssignment(assignmentRequest, id);
         return AssignmentMapper.INSTANCE.toResponse(assignment);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public AssignmentResponse deleteAssignment(@PathVariable Long id) {
         var assignment = assignmentService.deleteAssignment(id);
         return AssignmentMapper.INSTANCE.toResponse(assignment);
