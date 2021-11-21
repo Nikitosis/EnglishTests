@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class AssignmentService {
     private final AssignmentRepository assignmentRepository;
 
-    public Assignment findById(Long id) {
+    public Assignment getById(Long id) {
         return assignmentRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Assignment not found by id=%d", id)));
     }

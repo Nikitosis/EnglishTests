@@ -6,6 +6,5 @@ import java.util.List;
 
 @Data
 public class UserAnswersRequest {
-    private final Integer assignmentId;
     private List<AnswerRequest> answers;
 }

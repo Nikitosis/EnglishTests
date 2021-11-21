@@ -1,13 +1,10 @@
 package io.english.service;
 
-import io.english.entity.dao.Assignment;
-import io.english.entity.dao.User;
-import io.english.entity.dao.UserAssignment;
-import io.english.entity.dao.UserAssignmentStatus;
+import io.english.entity.dao.*;
 import io.english.entity.request.ChangeAssignmentIsAvailableRequest;
-import io.english.entity.response.UserAvailableAssignmentResponse;
+import io.english.entity.request.UserAnswersRequest;
+import io.english.exceptions.EntityNotFoundException;
 import io.english.exceptions.InvalidAccessException;
-import io.english.mappers.UserAssignmentMapper;
 import io.english.repository.UserAssignmentRepository;
 import io.english.utils.PrincipalUtils;
 import lombok.RequiredArgsConstructor;
@@ -22,16 +19,16 @@ public class UserAssignmentService {
     private final UserAssignmentRepository userAssignmentRepository;
     private final AssignmentService assignmentService;
     private final UserService userService;
+    private final AssignmentItemAnswerService assignmentItemAnswerService;
     private final PrincipalUtils principalUtils;
 
-    public List<UserAvailableAssignmentResponse> getAvailableAssignments() {
+    public List<UserAssignment> getAvailableAssignments() {
         Long userId = principalUtils.getUserIdFromPrincipal();
-        List<UserAssignment> userAssignments = userAssignmentRepository.findAllByUserIdAndIsAvailableTrue(userId);
-        return UserAssignmentMapper.INSTANCE.toAvailableResponses(userAssignments);
+        return userAssignmentRepository.findAllByUserIdAndIsAvailableTrue(userId);
     }
 
     public UserAssignment changeAssignmentIsAvailable(Long assignmentId, Long userId, ChangeAssignmentIsAvailableRequest changeAssignmentIsAvailableRequest) {
-        Assignment assignment = assignmentService.findById(assignmentId);
+        Assignment assignment = assignmentService.getById(assignmentId);
         Boolean isAvailable = changeAssignmentIsAvailableRequest.getIsAvailable();
         var student = userService.getById(userId);
         Optional<UserAssignment> optionalUserAssignment = userAssignmentRepository.findByAssignmentAndUser(assignment, student);
@@ -62,5 +59,43 @@ public class UserAssignmentService {
         userAssignmentRepository.save(userAssignment);
 
         return userAssignment;
+    }
+
+    public UserAssignment checkUserAnswers(UserAnswersRequest userAnswersRequest, Long assignmentId) {
+        Assignment assignment = assignmentService.getById(assignmentId);
+        Long userId = principalUtils.getUserIdFromPrincipal();
+        var user = userService.getById(userId);
+        var userAssignment = getByAssignmentAndUser(assignment, user);
+        int mark = (int) userAnswersRequest.getAnswers().stream()
+                .filter(answer -> assignmentItemAnswerService.getById(answer.getAssignmentAnswerId()).getIsCorrectAnswer())
+                .count();
+        userAssignment.setMark(mark);
+        if (assignment.getType().equals(AssignmentType.DEFAULT_KNOWLEDGE_TEST)) {
+            var englishLevel = getEnglishLevelFromMarkAndAssignment(mark, assignment);
+            user.setEnglishLevel(englishLevel);
+        }
+        return userAssignment;
+    }
+
+    private EnglishLevel getEnglishLevelFromMarkAndAssignment(int mark, Assignment assignment) {
+        int numberOfItems = assignment.getAssignmentItems().size();
+        double correctPercentage = (double) mark / numberOfItems;
+        if (correctPercentage > 0.95) {
+            return EnglishLevel.C2;
+        } else if (correctPercentage > 0.9) {
+            return EnglishLevel.C1;
+        } else if (correctPercentage > 0.8) {
+            return EnglishLevel.B2;
+        } else if (correctPercentage > 0.6) {
+            return EnglishLevel.B1;
+        } else if (correctPercentage > 0.35) {
+            return EnglishLevel.A2;
+        } else return EnglishLevel.A1;
+    }
+
+    public UserAssignment getByAssignmentAndUser(Assignment assignment, User student) {
+        return userAssignmentRepository.findByAssignmentAndUser(assignment, student).orElseThrow(() ->
+                new EntityNotFoundException(String.format("Assignment not found by assignment id=%d and user id=%d",
+                        assignment.getId(), student.getId())));
     }
 }

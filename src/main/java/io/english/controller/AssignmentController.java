@@ -2,6 +2,8 @@ package io.english.controller;
 
 import io.english.entity.dao.UserAssignment;
 import io.english.entity.request.ChangeAssignmentIsAvailableRequest;
+import io.english.entity.request.UserAnswersRequest;
+import io.english.entity.response.UserAnswerResponse;
 import io.english.entity.response.UserAssignmentResponse;
 import io.english.entity.response.UserAvailableAssignmentResponse;
 import io.english.mappers.UserAssignmentMapper;
@@ -19,7 +21,8 @@ public class AssignmentController {
 
     @GetMapping("available")
     public List<UserAvailableAssignmentResponse> getAvailableAssignments() {
-        return userAssignmentService.getAvailableAssignments();
+        List<UserAssignment> userAssignments = userAssignmentService.getAvailableAssignments();
+        return UserAssignmentMapper.INSTANCE.toAvailableResponses(userAssignments);
     }
 
     @PutMapping("{assignmentId}/user/{userId}")
@@ -27,7 +30,17 @@ public class AssignmentController {
             @RequestBody ChangeAssignmentIsAvailableRequest changeAssignmentIsAvailableRequest,
             @PathVariable Long assignmentId,
             @PathVariable Long userId) {
-        UserAssignment userAssignment = userAssignmentService.changeAssignmentIsAvailable(assignmentId, userId, changeAssignmentIsAvailableRequest);
+        UserAssignment userAssignment = userAssignmentService.changeAssignmentIsAvailable(
+                assignmentId,
+                userId,
+                changeAssignmentIsAvailableRequest);
         return UserAssignmentMapper.INSTANCE.toUserAssignmentResponse(userAssignment);
+    }
+
+    @PostMapping("{assignmentId}")
+    public UserAnswerResponse checkUserAnswers(@RequestBody UserAnswersRequest userAnswersRequest,
+                                               @PathVariable Long assignmentId) {
+        UserAssignment userAssignment = userAssignmentService.checkUserAnswers(userAnswersRequest, assignmentId);
+        return UserAssignmentMapper.INSTANCE.toUserAnswerResponse(userAssignment);
     }
 }
